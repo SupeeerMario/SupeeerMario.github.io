@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Uptime monitor · Khaled Shaaban</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <main class="post">
+    <a class="back glitch" href="../index.html">Khaled Shaaban</a>
+
+    <h1>Uptime monitor</h1>
+    <p class="stack">go · gin · postgresql · pgx · golang-migrate · docker compose</p>
+    <div class="result"><span class="big">0</span><span class="what">healthy checks blocked by a hung endpoint</span><span class="tag pass">PASS</span></div>
+
+    <section>
+      <h2>Why I built it</h2>
+      <p>I wanted to learn Go, and specifically its concurrency: goroutines, channels and worker pools on something real rather than tutorial examples. An uptime monitor was a natural fit, and it is something I can actually use to watch my own deployed projects, like the billing API.</p>
+    </section>
+
+    <section>
+      <h2>The failure</h2>
+      <p>A monitor checks many endpoints. If checks run one after another, a single endpoint that hangs makes every check behind it late, so healthy sites look slow or go unchecked.</p>
+    </section>
+
+    <section>
+      <h2>How it's guarded</h2>
+      <ul>
+        <li>A scheduler asks PostgreSQL every 5 seconds which monitors are due and dispatches them to a goroutine worker pool over a buffered channel.</li>
+        <li>In-flight probes are tracked so none is queued twice.</li>
+        <li>Each probe is stored as a row, writing the check and the monitor's last-checked time in one SQL statement.</li>
+        <li>Graceful shutdown saves every in-flight result before the database pool closes.</li>
+      </ul>
+      <pre>$ go test -race ./...
+hung + healthy endpoints   workers: pool   <span class="tag pass">PASS</span>
+hung + healthy endpoints   workers: 1      <span class="tag fail">FAIL</span>  # test catches it</pre>
+    </section>
+
+    <section>
+      <h2>What I learned</h2>
+      <p>The bug that got me first: the scheduler sometimes dispatched a monitor that was still being checked, so the same probe ran twice. The fix was tracking in-flight probes and skipping any monitor that is already running.</p>
+      <ul>
+        <li><strong>Go makes concurrency explicit.</strong> Compared to Node's event loop or Celery workers, you decide exactly how many things run and how they talk.</li>
+        <li><strong>Bound everything.</strong> A fixed pool size and a buffered channel stop one slow endpoint from taking over.</li>
+        <li><strong>Shutdown is a feature.</strong> Stopping cleanly, without losing in-flight results, matters as much as running.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Links</h2>
+      <p class="links"><a href="https://github.com/SupeeerMario/uptime-monitor">source</a></p>
+    </section>
+  </main>
+  <script src="../site.js"></script>
+</body>
+</html>

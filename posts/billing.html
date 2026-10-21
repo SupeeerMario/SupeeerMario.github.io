@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Multi-tenant billing API · Khaled Shaaban</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <main class="post">
+    <a class="back glitch" href="../index.html">Khaled Shaaban</a>
+
+    <h1>Multi-tenant billing API</h1>
+    <p class="stack">django · drf · postgresql · celery · redis · docker · github actions</p>
+    <div class="result"><span class="big">8 → 1</span><span class="what">concurrent payments → charges recorded</span><span class="tag pass">PASS</span></div>
+
+    <section>
+      <h2>Why I built it</h2>
+      <p>I read about a real race condition where two requests hit the same invoice at once and the customer got charged twice. I wanted to understand how that happens and how to make it impossible, not just unlikely.</p>
+      <p>It was also my excuse to go deeper with Django REST Framework (custom authentication, API design) and Celery with Redis for scheduled jobs like monthly invoicing.</p>
+    </section>
+
+    <section>
+      <h2>The failure</h2>
+      <p>Two payment requests for the same invoice arrive at the same moment. Both check "is this already paid?", both see "no", and the customer gets charged twice. A check in Python can't stop this, because both requests pass it before either one writes.</p>
+    </section>
+
+    <section>
+      <h2>How it's guarded</h2>
+      <ul>
+        <li>A unique index on (tenant, idempotency key) makes PostgreSQL reject the second payment, no matter how close together they arrive.</li>
+        <li>Every money movement goes into an append-only double-entry ledger. Tests assert it sums to zero and that receivables equal open invoices, before and after payment.</li>
+        <li>A custom DRF API-key auth class scopes every query to one tenant.</li>
+        <li>Monthly invoicing runs on Celery beat, with unique constraints so no run bills twice.</li>
+      </ul>
+      <pre>$ fire 8 payments at invoice #1
+unique index: on    charges recorded: 1   <span class="tag pass">PASS</span>
+unique index: off   charges recorded: 8   <span class="tag fail">FAIL</span></pre>
+    </section>
+
+    <section>
+      <h2>What I learned</h2>
+      <p>My first fix was a Python check: "if the invoice is already paid, stop." It looked right and passed a normal test. The concurrent test fired 8 payments at once and recorded 8 charges, because every request passed the check before any of them wrote. Moving the rule into a unique index in PostgreSQL is what fixed it.</p>
+      <p>The double-entry ledger took me longest. Getting debits and credits to always sum to zero made me slow down and think about where money actually moves.</p>
+      <ul>
+        <li><strong>Let the database enforce rules.</strong> Under concurrency, constraints beat application checks.</li>
+        <li><strong>A test only counts if it fails without the guard.</strong> Removing the index and watching the test go red is the real proof.</li>
+        <li><strong>Money needs a ledger.</strong> Never just update a balance; record every movement.</li>
+        <li><strong>Tenant isolation breaks easily.</strong> One unscoped query and customers see each other's data, so scoping lives in the auth class, not in each view.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Links</h2>
+      <p class="links"><a href="https://multi-tenant-billing-app.duckdns.org/api/docs/">live api docs</a><a href="https://github.com/SupeeerMario/multi-tenant-billing-system">source</a></p>
+    </section>
+  </main>
+  <script src="../site.js"></script>
+</body>
+</html>

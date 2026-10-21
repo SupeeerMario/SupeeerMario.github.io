@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Khaled Shaaban · Backend Engineer</title>
+  <meta name="description" content="Junior backend engineer. I crash my own systems on purpose and prove each fix with a test.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <div class="layout">
+    <header class="side">
+      <h1 class="glitch">Khaled Shaaban</h1>
+      <p class="tagline">Backend engineer. I crash my own systems <em>on purpose</em>, then prove they survive.</p>
+      <p class="availability"><span class="dot"></span>open to junior roles</p>
+      <ul class="contact">
+        <li><a href="mailto:khaledcfeki@gmail.com">khaledcfeki@gmail.com</a></li>
+        <li><a href="https://github.com/SupeeerMario">github</a></li>
+        <li><a href="https://linkedin.com/in/khaled-elfeki">linkedin</a></li>
+      </ul>
+    </header>
+
+    <main class="content">
+      <section>
+        <h2>Crash tests</h2>
+        <p class="intro">Each project stages a real production failure. Every number below comes from a test in the repo.</p>
+
+        <article class="test">
+          <div class="test-head">
+            <h3>Multi-tenant billing API</h3>
+            <span class="stack">django · drf · postgresql · celery · redis</span>
+          </div>
+          <p class="failure">Failure: a customer gets charged twice.</p>
+          <div class="result"><span class="big">8 → 1</span><span class="what">concurrent payments → charges recorded</span><span class="tag pass">PASS</span></div>
+          <details>
+            <summary>how it's guarded</summary>
+            <p><span class="k">guard</span>A unique index on (tenant, idempotency key) in PostgreSQL instead of a Python check. Every money movement goes into an append-only double-entry ledger that must sum to zero.</p>
+            <pre>$ fire 8 payments at invoice #1
+unique index: <span id="idx" class="pass">on</span>
+charges recorded: <span id="charges">1</span>   <span id="verdict" class="tag pass">PASS</span></pre>
+            <button type="button" id="toggle">drop the index</button>
+            <p><span class="k">ci</span>Ruff, tests against PostgreSQL 17 and a Docker build in about 45 seconds. Deployed on an Oracle Cloud VM.</p>
+          </details>
+          <div class="links"><a class="read" href="posts/billing.html">read the story</a><a href="https://multi-tenant-billing-app.duckdns.org/api/docs/">live api docs</a><a href="https://github.com/SupeeerMario/multi-tenant-billing-system">source</a></div>
+        </article>
+
+        <article class="test">
+          <div class="test-head">
+            <h3>Bulk file import pipeline</h3>
+            <span class="stack">node.js · mongodb · redis streams · minio</span>
+          </div>
+          <p class="failure">Failure: the worker dies halfway through a huge import.</p>
+          <div class="result"><span class="big">500,000 / 500,000</span><span class="what">rows after killing the worker</span><span class="tag pass">PASS</span></div>
+          <details>
+            <summary>how it's guarded</summary>
+            <p><span class="k">guard</span>Each 1,000-row chunk commits with its checkpoint in one MongoDB transaction, so a second worker resumes exactly where the first died. Redis Streams consumer groups, idempotent upserts, dead-letter stream after 5 attempts.</p>
+            <pre>$ import 500,000 rows (30 MB)   memory: 120-131 MB flat
+$ kill worker-1                  # mid-import
+$ start worker-2                 # resumes from checkpoint
+rows: 500,000   gaps: 0   duplicates: 0   <span class="tag pass">PASS</span></pre>
+          </details>
+          <div class="links"><a class="read" href="posts/import-pipeline.html">read the story</a><a href="https://github.com/SupeeerMario/bulk-data-import-pipeline">source</a></div>
+        </article>
+
+        <article class="test">
+          <div class="test-head">
+            <h3>Uptime monitor</h3>
+            <span class="stack">go · gin · postgresql · pgx</span>
+          </div>
+          <p class="failure">Failure: one slow endpoint stalls every other check.</p>
+          <div class="result"><span class="big">0</span><span class="what">healthy checks blocked by a hung endpoint</span><span class="tag pass">PASS</span></div>
+          <details>
+            <summary>how it's guarded</summary>
+            <p><span class="k">guard</span>A scheduler asks PostgreSQL every 5 seconds which monitors are due and dispatches them to a goroutine worker pool over a buffered channel. Graceful shutdown saves every in-flight result.</p>
+            <pre>$ go test -race ./...
+hung + healthy endpoints   workers: pool   <span class="tag pass">PASS</span>
+hung + healthy endpoints   workers: 1      <span class="tag fail">FAIL</span>  # test catches it</pre>
+          </details>
+          <div class="links"><a class="read" href="posts/uptime-monitor.html">read the story</a><a href="https://github.com/SupeeerMario/uptime-monitor">source</a></div>
+        </article>
+      </section>
+
+      <section>
+        <h2>Shipped to a client</h2>
+        <div class="row">
+          <span class="date">2025-09</span>
+          <div>
+            <h3>Arabic OCR document API</h3>
+            <p>Freelance. Extracts Arabic and English text from PDFs and images up to 50 MB. Async jobs with polled status, results delivered as Word documents.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>B.Sc. Software Industry &amp; Multimedia, Alexandria University, 2024</footer>
+    </main>
+  </div>
+  <script src="site.js"></script>
+</body>
+</html>
