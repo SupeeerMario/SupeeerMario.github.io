@@ -68,14 +68,23 @@ if (canvas) {
 if (!reduced) {
   const junk = '!@#$%&*<>/\\|01';
   document.querySelectorAll('.glitch').forEach((el) => {
-    const chars = [...el.textContent].map((c) => {
-      const span = document.createElement('span');
-      span.className = 'ch';
-      span.textContent = c;
-      span.dataset.c = c;
-      return span;
+    // Group letters per word so the name only wraps between words.
+    const chars = [];
+    const words = el.textContent.split(' ').map((w) => {
+      const word = document.createElement('span');
+      word.className = 'word';
+      for (const c of w) {
+        const span = document.createElement('span');
+        span.className = 'ch';
+        span.textContent = c;
+        span.dataset.c = c;
+        chars.push(span);
+        word.append(span);
+      }
+      return word;
     });
-    el.replaceChildren(...chars);
+    el.replaceChildren();
+    words.forEach((word, i) => el.append(...(i ? [' ', word] : [word])));
     const hit = () => {
       const span = chars[Math.floor(Math.random() * chars.length)];
       if (span.dataset.c.trim()) {
