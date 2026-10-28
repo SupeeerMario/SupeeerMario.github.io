@@ -18,7 +18,14 @@
       <h1 class="glitch">Khaled Shaaban</h1>
       <p class="tagline">Backend engineer. I crash my own systems <em>on purpose</em>, then prove they survive.</p>
       <p class="availability"><span class="dot"></span>open to junior roles</p>
+      <nav class="nav" aria-label="Sections">
+        <a href="#about">about</a>
+        <a href="#projects">projects</a>
+        <a href="#skills">skills &amp; tech</a>
+      </nav>
       <ul class="contact">
+        <li><a href="files/Khaled_Shaaban_CV.pdf" target="_blank" rel="noopener">cv</a></li>
+        <li><a href="files/cover-letter.pdf" target="_blank" rel="noopener">cover letter</a></li>
         <li><a href="mailto:khaledcfeki@gmail.com">khaledcfeki@gmail.com</a></li>
         <li><a href="https://github.com/SupeeerMario">github</a></li>
         <li><a href="https://linkedin.com/in/khaled-elfeki">linkedin</a></li>
@@ -26,8 +33,17 @@
     </header>
 
     <main class="content">
-      <section>
-        <h2>Crash tests</h2>
+      <section id="about">
+        <h2>About me</h2>
+        <div class="prose">
+          <p>I'm Khaled, a backend engineer from Alexandria, Egypt. I graduated in Software Industry &amp; Multimedia from Alexandria University in 2024 and have spent my time since building the kind of systems that break in expensive ways: payments, bulk imports, monitoring.</p>
+          <p>My habit is simple. Before I call something done, I try to kill it. I fire concurrent requests at the same invoice, kill a worker mid-import, point a monitor at an endpoint that never answers. Then I write the test that fails when the guarantee breaks, so the fix stays fixed.</p>
+          <p>I work mostly in Python, Node.js and Go on PostgreSQL, MongoDB and Redis. Right now I'm going deeper on DevOps (CI, containers, deploying to real VMs) and picking up frontend so I can ship a feature end to end.</p>
+        </div>
+      </section>
+
+      <section id="projects">
+        <h2>Projects</h2>
         <p class="intro">Each project stages a real production failure. Every number below comes from a test in the repo.</p>
 
         <article class="test">
@@ -95,6 +111,34 @@ hung + healthy endpoints   workers: 1      <span class="tag fail">FAIL</span>  #
           </div>
         </div>
       </section>
+
+      <section id="skills">
+        <h2>Skills &amp; tech</h2>
+        <p class="intro">Every item here is used in a project above.</p>
+        <div class="skills">
+          <div class="skill">
+            <h3>Languages</h3>
+            <ul class="chips"><li>Python</li><li>Go</li><li>JavaScript (Node.js)</li><li>SQL</li></ul>
+          </div>
+          <div class="skill">
+            <h3>Backend</h3>
+            <ul class="chips"><li>Django</li><li>Django REST Framework</li><li>Express.js</li><li>Gin</li><li>REST API design</li><li>API-key authentication</li><li>OpenAPI / Swagger</li></ul>
+          </div>
+          <div class="skill">
+            <h3>Databases &amp; queues</h3>
+            <ul class="chips"><li>PostgreSQL</li><li>MongoDB (Mongoose, transactions)</li><li>Redis</li><li>Redis Streams</li><li>Celery</li></ul>
+          </div>
+          <div class="skill">
+            <h3>Cloud &amp; DevOps</h3>
+            <ul class="chips"><li>Docker</li><li>Docker Compose</li><li>GitHub Actions (CI/CD)</li><li>Git</li><li>Gunicorn</li><li>Linux</li><li>Oracle Cloud VM</li><li>MinIO (S3-compatible storage)</li></ul>
+          </div>
+          <div class="skill">
+            <h3>Testing &amp; quality</h3>
+            <ul class="chips"><li>Django test runner</li><li>Go race detector</li><li>concurrency &amp; failure testing</li><li>Ruff</li></ul>
+          </div>
+        </div>
+      </section>
+
 
       <footer>B.Sc. Software Industry &amp; Multimedia, Alexandria University, 2024</footer>
     </main>

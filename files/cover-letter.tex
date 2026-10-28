@@ -1,0 +1,54 @@
+% Build: pdflatex cover-letter.tex
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1.6cm,top=1.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[scaled]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{xcolor,fontawesome5,tcolorbox}
+\tcbuselibrary{skins}
+\usepackage[hidelinks]{hyperref}
+\definecolor{page}{HTML}{F3F3F3}
+\definecolor{ink}{HTML}{1A1A1A}
+\pagecolor{page}
+\color{ink}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1.1em}
+\linespread{1.25}
+
+\begin{document}
+
+{\fontsize{22}{26}\selectfont\bfseries KHALED SHAABAN}\\[2pt]
+{\large Backend Developer}
+
+\vspace{-0.6em}\textcolor{ink!60}{\rule{\linewidth}{0.6pt}}\par\vspace{-0.4em}
+
+\small
+\faEnvelope\ \href{mailto:khaledcfeki@gmail.com}{khaledcfeki@gmail.com}\hfill
+\faGithub\ \href{https://github.com/SupeeerMario}{github.com/SupeeerMario}\hfill
+\faLinkedin\ \href{https://linkedin.com/in/khaled-elfeki}{linkedin.com/in/khaled-elfeki}
+\normalsize
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced,colback=white,colframe=white,arc=0pt,boxrule=0pt,
+  left=1.2cm,right=1.2cm,  top=1.2cm,bottom=5.5cm,
+  overlay={\fill[ink] ([xshift=-2pt,yshift=-1.05cm]frame.north west) rectangle ++(5pt,-1.7cm);}]
+\setlength{\parskip}{1.1em}\raggedright
+{\large\bfseries Junior Backend Developer}
+
+\textbf{Dear Hiring Team,}\par\vspace{-0.7em}
+
+I'm a backend developer who builds REST APIs in Python (Django, DRF), Node.js (Express) and Go, and ships them end to end, from the code to Docker, a GitHub Actions pipeline and a Linux server. Beyond writing features, I care about what happens when things go wrong: before I call something done, I try to break it, then write the test that proves it holds.
+
+I've also delivered work to a client as a freelancer: an Arabic and English OCR REST API that processes PDFs and images up to 50\,MB as background jobs and returns the results as Word documents. Alongside that, I built three projects that each solve a real production failure. In my billing API, eight simultaneous payments on one invoice record exactly one charge. In my import pipeline, I killed the worker halfway through a 500,000-row file and a second worker finished it with no gaps or duplicates. In my uptime monitor, a race-detector test proves one hung endpoint cannot block the healthy ones.
+
+These projects taught me to put guarantees where they cannot be skipped, in database constraints, transactions and tests, and to treat a feature as finished only when it is deployed and verified. I hold a B.Sc. in Software Industry and Multimedia from Alexandria University, and I'm looking for a long-term role where I can contribute consistently, learn from experienced engineers and grow with the team.
+
+\vspace{1.5em}
+\hfill\begin{tabular}{c}
+Best Regards,\\[6pt]
+{\large\bfseries Khaled Shaaban}
+\end{tabular}\hspace{1cm}
+\end{tcolorbox}
+
+\end{document}
